@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="mybatis-mysql.properties">
+		<property name="driver-mysql" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://127.0.0.1:3306/test"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="ldis0815"></property>
+	</properties>
+
+	<settings>
+		<!-- 将数据库字段命名规则A_COLUMN转换为Java使用的驼峰式命名规则aCloumn -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="logImpl" value="LOG4J" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="aggressiveLazyLoading" value="false" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="User" type="com.pactrex.mybatis.demo.model.User" />
+		<typeAlias alias="SqlLog" type="com.pactrex.mybatis.demo.model.SqlLog" />
+	</typeAliases>
+	
+	<objectFactory type="com.pactrex.mybatis.demo.plugin.CustomerObjectFactory">
+		 <property name="objectFactoryProperty" value="100"/>
+	</objectFactory>
+	
+	<plugins>
+	  <plugin interceptor="com.pactrex.mybatis.demo.plugin.SqlInterceptor">
+	    <property name="pluginProperty" value="100"/>
+	  </plugin>
+	</plugins>
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver-mysql}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+
+		<environment id="product">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="com.mysql.jdbc.Driver" />
+				<property name="url" value="jdbc:mysql://127.0.0.1:3306/mybatis" />
+				<property name="username" value="root" />
+				<property name="password" value="cope9020" />
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource="mapper/User.xml" />
+		<mapper resource="mapper/Sales.xml" />  
+		<mapper resource="mapper/SqlLog.xml" />  
+		<mapper class="com.pactrex.mybatis.demo.dao.ICommunicatorDao" />
+	</mappers>
+	
+</configuration>  

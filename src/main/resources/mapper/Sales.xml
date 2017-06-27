@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+  
+<mapper namespace="com.pactrex.mybatis.demo.dao.ISalesDao">  
+    <resultMap id="salesResultMap" type="com.pactrex.mybatis.demo.model.Sales">  
+        <id property="salesId" column="sales_id" />  
+        <result property="salesName" column="sales_name" />  
+        <result property="phone" column="sales_phone" />  
+        <result property="fax" column="sales_fax" />  
+        <result property="email" column="sales_email" />  
+  
+        <!-- 定义多对一关联信息（每个销售人员对应一个登录帐号） -->  
+       <!--  <association property="userInfo" column="user_id" javaType="User" select="selectUser"  fetchType="eager">  
+            <id property="userId" column="user_id" />  
+            <result property="userName" column="user_name" />  
+            <result property="userPassword" column="user_password" />  
+            <result property="nickName" column="nick_name" />  
+            <result property="email" column="email" />  
+            <result property="isValid" column="is_valid" />  
+            <result property="createdTime" column="created_time" />  
+            <result property="updateTime" column="update_time" />
+        </association> -->
+         <association property="userInfo" resultMap="userResult" /> 
+         
+         <!-- <collection property="customers" javaType="ArrayList" column="sales_id" ofType="Customer" select="getCustomerForSales" />  -->
+         
+         <collection property="customers" ofType="com.pactrex.mybatis.demo.model.Customer">  
+	        <id property="customerId" column="customer_id" />  
+	        <result property="customerName" column="customer_name" />  
+	        <result property="isValid" column="is_valid" />  
+	        <result property="createdTime" column="created_time" />  
+	        <result property="updateTime" column="updated_time" />  
+	        <!-- 映射客户与登录用户的关联关系，请注意columnPrefix属性 -->  
+	        <association property="userInfo" resultMap="userResult" columnPrefix="cu_" />  
+	    </collection>  
+    </resultMap>  
+    
+    <resultMap id="userResult" type="User" >  
+        <id property="userId" column="user_id" />  
+        <result property="userName" column="user_name" />  
+        <result property="userPassword" column="user_password" />  
+        <result property="nickName" column="nick_name" />  
+        <result property="email" column="user_email" />  
+        <result property="isValid" column="user_is_valid" />  
+        <result property="createdTime" column="user_created_time" />  
+        <result property="updateTime" column="user_updated_time" />  
+    </resultMap>
+    
+    <select id="getCustomerForSales" resultType="com.pactrex.mybatis.demo.model.Customer">  
+	    SELECT c.customer_id, c.customer_name, c.user_id, c.is_valid,  
+	    c.created_time, c.update_time  
+	    FROM customer c INNER JOIN customer_sales s USING(customer_id)  
+	    WHERE s.sales_id = #{id}  
+	</select>  
+      
+    <select id="selectUser" resultType="User">  
+        SELECT user_id, user_name, user_password, nick_name, email, is_valid, created_time  
+        FROM sys_user WHERE user_id = #{id}  
+    </select>  
+      
+    <!-- <select id="getById" parameterType="int" resultMap="salesResultMap" >  
+        SELECT sales_id, sales_name, sales_phone, sales_fax, sales_email, user_id, is_valid, created_time, update_time  
+        FROM salesman WHERE sales_id=#{id}  
+    </select> -->
+    
+  <!--   <select id="getById" parameterType="int" resultMap="salesResultMap">  
+        SELECT  
+        sales_id, sales_name, sales_phone, sales_fax, sales_email,  
+        salesman.is_valid, salesman.created_time, salesman.update_time,  
+        sys_user.user_id as user_id, user_name, user_password, nick_name,  
+        email as user_email,  
+        sys_user.is_valid as user_is_valid, sys_user.created_time as  
+        user_created_time,  
+        sys_user.updated_time as user_update_time  
+        FROM  
+        salesman left outer join sys_user using(user_id)  
+        WHERE sales_id=#{id}  
+    </select>  --> 
+    
+    <select id="getById" parameterType="int" resultMap="salesResultMap">  
+	    SELECT  
+	        s.sales_id, s.sales_name, s.sales_phone, s.sales_fax, s.sales_email,  
+	        s.is_valid, s.created_time, s.update_time,  
+	        su.user_id as user_id, su.user_name, su.user_password, su.nick_name,  
+	        su.email as user_email,  
+	        su.is_valid as user_is_valid,  
+	        su.created_time as user_created_time,  
+	        su.updated_time as user_update_time,  
+	        c.customer_id, c.customer_name, c.is_valid as customer_is_valid,  
+	        c.created_time as customer_created_time,  
+	        c.update_time as customer_updated_time,  
+	        cu.user_id as cu_user_id, cu.user_name as cu_user_name, cu.user_password as cu_user_password,   
+	        cu.nick_name as cu_nick_name, cu.email as cu_user_email, cu.is_valid as cu_user_is_valid,  
+	        cu.created_time as cu_user_created_time, cu.updated_time as cu_user_update_time  
+	    FROM  
+	        salesman s LEFT OUTER JOIN sys_user su ON s.user_id = su.user_id  
+	        INNER JOIN customer_sales cs USING(sales_id)  
+	        LEFT OUTER JOIN customer c USING(customer_id)  
+	        LEFT OUTER JOIN sys_user cu ON c.user_id = cu.user_id  
+	    WHERE sales_id=#{id}  
+	</select>
+</mapper>  

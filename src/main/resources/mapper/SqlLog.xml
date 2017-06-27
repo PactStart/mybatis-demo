@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+  
+<mapper namespace="com.pactrex.mybatis.demo.model.SqlLog">  
+  
+  <sql id="sqlLogCloumns"> caluse,updated_rows,created,cost </sql>
+  
+    <insert id="insertSqlLog" parameterType="SqlLog" useGeneratedKeys="true"  
+        keyProperty="id">  
+        INSERT INTO sql_log(<include refid="sqlLogCloumns" />)  
+        VALUES(#{caluse},  
+        #{updatedRows}, #{created}, #{cost})
+    </insert>  
+</mapper>  
